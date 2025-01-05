@@ -69,12 +69,23 @@ public class Main {
         System.out.println("---------------------------------------");
         System.out.println("Simulation of CPU Scheduling Algorithms");
         System.out.println("---------------------------------------");
-
-        System.out.println("\nEnter the number of process:");
-        int value = input.nextInt();
-        for (int i = 0; i < value; i++) // create process name based on the number of process
-            processName.add("P" + i);
-
+        
+        int value;
+        
+        do {
+            System.out.println("\nEnter the number of process (3 - 10):");
+            value = input.nextInt();
+            if (value < 3 || value > 10)
+            {
+                System.out.println("The value must be between 3 and 10. Please try again.");
+            }
+            else
+            {
+                for (int i = 0; i < value; i++) // create process name based on the number of process
+                    processName.add("P" + i);
+            }
+        }
+        while (value < 3 || value > 10);
         return value;
     }
 
