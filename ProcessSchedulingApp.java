@@ -1,11 +1,6 @@
 import java.util.*;
 
 public class ProcessSchedulingApp {
-    public static void main(String[] args) {
-        new ProcessSchedulingApp();
-    }
-
-//-------------------------------------------------------------------------------------------------------------------
 
     Scanner input = new Scanner(System.in);
 
