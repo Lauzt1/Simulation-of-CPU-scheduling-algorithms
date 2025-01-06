@@ -1,8 +1,8 @@
 import java.util.*;
 
-public class Main {
+public class ProcessSchedulingApp {
     public static void main(String[] args) {
-        new Main();
+        new ProcessSchedulingApp();
     }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -27,11 +27,12 @@ public class Main {
     LinkedList<Integer> turnaroundTime = new LinkedList<>();
     LinkedList<Integer> waitingTime = new LinkedList<>();
 
-    int totalTurnaroundTime, totalWaitingTime, averageTurnaroundTime, averageWaitingTime;
+    int totalTurnaroundTime, totalWaitingTime;
+    double averageTurnaroundTime, averageWaitingTime;
 
 //-------------------------------------------------------------------------------------------------------------------
 
-    public Main() {
+    public ProcessSchedulingApp() {
         numberOfProcess = getNumberOfProcess();
 
         arrivalTime = getValues("arrival time");
@@ -45,16 +46,20 @@ public class Main {
         do {
             typeOfAlgorithm = getTypeOfAlgorithm();
 
-            if (typeOfAlgorithm == 1)
-                RR();
-            else if (typeOfAlgorithm == 2)
-                SJN();
-            else if (typeOfAlgorithm == 3)
-                PP();
-            else if (typeOfAlgorithm == 4)
-                NPP();
+            clearData();
 
-            System.out.println("\nDo you want check the result for other type of algorithm?");
+            if (typeOfAlgorithm == 1)
+                new RR(this).startProcess();
+            else if (typeOfAlgorithm == 2)
+                new SJN(this).startProcess();
+            else if (typeOfAlgorithm == 3)
+                new PP(this).startProcess();
+            else if (typeOfAlgorithm == 4)
+                new NPP(this).startProcess();
+
+            displayResult();
+
+            System.out.println("\nDo you want to check the result for other type of algorithm?");
             System.out.println("[1] Yes");
             System.out.println("[2] No");
             System.out.println("Enter your selection: ");
@@ -69,12 +74,23 @@ public class Main {
         System.out.println("---------------------------------------");
         System.out.println("Simulation of CPU Scheduling Algorithms");
         System.out.println("---------------------------------------");
-
-        System.out.println("\nEnter the number of process:");
-        int value = input.nextInt();
-        for (int i = 0; i < value; i++) // create process name based on the number of process
-            processName.add("P" + i);
-
+        
+        int value;
+        
+        do {
+            System.out.println("\nEnter the number of process (3 - 10):");
+            value = input.nextInt();
+            if (value < 3 || value > 10)
+            {
+                System.out.println("The value must be between 3 and 10. Please try again.");
+            }
+            else
+            {
+                for (int i = 0; i < value; i++) // create process name based on the number of process
+                    processName.add("P" + i);
+            }
+        }
+        while (value < 3 || value > 10);
         return value;
     }
 
@@ -104,47 +120,6 @@ public class Main {
 
 //-------------------------------------------------------------------------------------------------------------------
 
-    private void RR() {
-        clearData();
-
-        // algorithm that will update the LinkedList of ganttChartTime, ganttChartProcess, and finishTime
-        // Just an example code that will update the ganttChartTime, ganttChartProcess, and finishTime
-        ganttChartTime.add(0);
-        for (int i = 0; i < numberOfProcess; i++) {
-            ganttChartTime.add(i + 29);
-            ganttChartProcess.add("P" + i);
-            finishTime.add(i + 29);
-        }
-
-        displayResult();
-    }
-
-    private void SJN() {
-        clearData();
-
-        // algorithm that will update the LinkedList of ganttChartTime, ganttChartProcess, and finishTime
-
-        displayResult();
-    }
-
-    private void PP() {
-        clearData();
-
-        // algorithm that will update the LinkedList of ganttChartTime, ganttChartProcess, and finishTime
-
-        displayResult();
-    }
-
-    private void NPP() {
-        clearData();
-
-        // algorithm that will update the LinkedList of ganttChartTime, ganttChartProcess, and finishTime
-
-        displayResult();
-    }
-
-//-------------------------------------------------------------------------------------------------------------------
-
     private void clearData() {
         ganttChartTime.clear();
         ganttChartProcess.clear();
@@ -162,7 +137,7 @@ public class Main {
             waitingTime.add(turnaroundTime.get(i) - burstTime.get(i));
         }
 
-        // Display the Gantt Chart and Table
+        // Display the Gantt Chart and Table, will change later to visual form
         System.out.println("\nGantt Chart Time:\n" + ganttChartTime);
         System.out.println(ganttChartTime.size());
         System.out.println("\nGantt Chart Process:\n" + ganttChartProcess);
@@ -178,8 +153,8 @@ public class Main {
             totalTurnaroundTime += turnaroundTime.get(i);
             totalWaitingTime += waitingTime.get(i);
         }
-        averageTurnaroundTime = totalTurnaroundTime / numberOfProcess;
-        averageWaitingTime = totalWaitingTime / numberOfProcess;
+        averageTurnaroundTime = (double)totalTurnaroundTime / numberOfProcess;
+        averageWaitingTime = (double)totalWaitingTime / numberOfProcess;
         System.out.println("\nAverage Turnaround Time: " + averageTurnaroundTime);
         System.out.println("\nAverage Waiting Time: " + averageWaitingTime);
     }
