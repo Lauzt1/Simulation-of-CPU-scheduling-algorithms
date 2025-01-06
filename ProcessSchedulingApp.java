@@ -124,7 +124,51 @@ public class ProcessSchedulingApp {
     }
 
 //-------------------------------------------------------------------------------------------------------------------
-    
+    private void printGanttChart() {
+    int k = 0;
+    for (int i = 0; i < (totalBurstTime * 4) + 1; i++) {
+        System.out.print('-');
+    }
+    System.out.println();
+
+    for (int i = 0; i < totalBurstTime * 4; i++) {
+        if (i == 0 || i == (totalBurstTime * 4) - 1) {
+            System.out.print('|');
+        } else {
+            if (k < processName.size()) {
+                if (k == processName.size() - 1) {
+                    System.out.printf("%-" + ((burstTime.get(k) * 4) - 1) + "s", processName.get(k));
+                }
+                else {
+                    System.out.printf("%-" + ((burstTime.get(k) * 4) - 1) + "s", processName.get(k));
+                    System.out.print('|');
+                }
+                k++;
+            }
+        }
+    }
+    System.out.println();
+
+    for (int i = 0; i < (totalBurstTime * 4) + 1; i++) {
+        System.out.print('-');
+    }
+    System.out.println();
+
+    System.out.printf("%-" + (burstTime.getFirst() * 4) + "s", arrivalTime.getFirst());
+    for (int j = 0; j < processName.size(); j++) {
+        if (j != processName.size() - 1) {
+            System.out.printf("%-" + (burstTime.get(j + 1) * 4) + "s", finishTime.get(j));
+        }
+        else {
+            System.out.print(finishTime.get(j));
+        }
+    }
+    System.out.println();
+    System.out.println();
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+
     private void printTable() {
         for (int i = 0; i < 71; i++) {
             System.out.print('-');
@@ -214,6 +258,7 @@ public class ProcessSchedulingApp {
         }
 
         // Display the Gantt Chart and Table, will change later to visual form
+        printGanttChart();
         printTable();
 
         // Obtain and display the Average Turnaround Time and Average Waiting Time
