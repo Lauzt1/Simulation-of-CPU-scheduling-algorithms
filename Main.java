@@ -244,8 +244,8 @@ public class Main {
             totalTurnaroundTime += turnaroundTime.get(i);
             totalWaitingTime += waitingTime.get(i);
         }
-        averageTurnaroundTime = totalTurnaroundTime / numberOfProcess;
-        averageWaitingTime = totalWaitingTime / numberOfProcess;
+        averageTurnaroundTime = (double)totalTurnaroundTime / numberOfProcess;
+        averageWaitingTime = (double)totalWaitingTime / numberOfProcess;
         System.out.println("\nAverage Turnaround Time: " + averageTurnaroundTime);
         System.out.println("\nAverage Waiting Time: " + averageWaitingTime);
     }
