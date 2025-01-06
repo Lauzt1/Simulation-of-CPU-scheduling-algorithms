@@ -27,7 +27,8 @@ public class Main {
     LinkedList<Integer> turnaroundTime = new LinkedList<>();
     LinkedList<Integer> waitingTime = new LinkedList<>();
 
-    int totalTurnaroundTime, totalWaitingTime, averageTurnaroundTime, averageWaitingTime;
+    int totalTurnaroundTime, totalWaitingTime;
+    double averageTurnaroundTime, averageWaitingTime;
 
 //-------------------------------------------------------------------------------------------------------------------
 
