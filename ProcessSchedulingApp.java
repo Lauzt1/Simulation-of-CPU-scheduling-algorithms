@@ -4,20 +4,20 @@ public class ProcessSchedulingApp {
 
     Scanner input = new Scanner(System.in);
 
-    int numberOfProcess;
+    public int numberOfProcess;
 
-    LinkedList<String> processName = new LinkedList<>();
-    LinkedList<Integer> arrivalTime = new LinkedList<>();
-    LinkedList<Integer> burstTime = new LinkedList<>();
-    LinkedList<Integer> priority = new LinkedList<>();
+    public LinkedList<String> processName = new LinkedList<>();
+    public LinkedList<Integer> arrivalTime = new LinkedList<>();
+    public LinkedList<Integer> burstTime = new LinkedList<>();
+    public LinkedList<Integer> priority = new LinkedList<>();
 
-    int totalBurstTime;
+    public int totalBurstTime;
 
-    int typeOfAlgorithm;
+    public int typeOfAlgorithm;
 
-    LinkedList<Integer> ganttChartTime = new LinkedList<>();
-    LinkedList<String> ganttChartProcess = new LinkedList<>();
-    LinkedList<Integer> finishTime = new LinkedList<>();
+    public LinkedList<Integer> ganttChartTime = new LinkedList<>();
+    public LinkedList<String> ganttChartProcess = new LinkedList<>();
+    public LinkedList<Integer> finishTime = new LinkedList<>();
 
     LinkedList<Integer> turnaroundTime = new LinkedList<>();
     LinkedList<Integer> waitingTime = new LinkedList<>();
@@ -124,6 +124,7 @@ public class ProcessSchedulingApp {
     }
 
 //-------------------------------------------------------------------------------------------------------------------
+
     private void printGanttChart() {
     int k = 0;
     for (int i = 0; i < (totalBurstTime * 4) + 1; i++) {
