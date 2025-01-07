@@ -126,42 +126,38 @@ public class ProcessSchedulingApp {
 //-------------------------------------------------------------------------------------------------------------------
 
     private void printGanttChart() {
-    int k = 0;
-    for (int i = 0; i < (totalBurstTime * 4) + 1; i++) {
+    int j = 1;
+    for (int i = 0; i < ((totalBurstTime + 1) * 4); i++) {
         System.out.print('-');
     }
     System.out.println();
 
-    for (int i = 0; i < totalBurstTime * 4; i++) {
-        if (i == 0 || i == (totalBurstTime * 4) - 1) {
+    for (int i = 0; i < (totalBurstTime * 4); i++) {
+        if (i == 0) {
             System.out.print('|');
-        } else {
-            if (k < processName.size()) {
-                if (k == processName.size() - 1) {
-                    System.out.printf("%-" + ((burstTime.get(k) * 4) - 1) + "s", processName.get(k));
-                }
-                else {
-                    System.out.printf("%-" + ((burstTime.get(k) * 4) - 1) + "s", processName.get(k));
+        } 
+        else {
+            if (j <= ganttChartProcess.size()) {
+                    System.out.printf("%-" + (((ganttChartTime.get(j) - ganttChartTime.get(j - 1))) * 4) + "s", ganttChartProcess.get(j - 1));
                     System.out.print('|');
                 }
-                k++;
+                j++;
             }
         }
-    }
+        
     System.out.println();
 
-    for (int i = 0; i < (totalBurstTime * 4) + 1; i++) {
+    for (int i = 0; i < ((totalBurstTime + 1) * 4); i++) {
         System.out.print('-');
     }
     System.out.println();
 
-    System.out.printf("%-" + (burstTime.getFirst() * 4) + "s", arrivalTime.getFirst());
-    for (int j = 0; j < processName.size(); j++) {
-        if (j != processName.size() - 1) {
-            System.out.printf("%-" + (burstTime.get(j + 1) * 4) + "s", finishTime.get(j));
+    for (int k = 0; k < ganttChartTime.size(); k++) {
+        if (k == ganttChartTime.size() - 1) {
+            System.out.print(ganttChartTime.getLast());
         }
         else {
-            System.out.print(finishTime.get(j));
+            System.out.printf("%-" + (((ganttChartTime.get(k + 1) - ganttChartTime.get(k)) * 4) + 1) + "s", ganttChartTime.get(k));
         }
     }
     System.out.println();
