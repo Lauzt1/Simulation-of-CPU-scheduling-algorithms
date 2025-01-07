@@ -126,28 +126,21 @@ public class ProcessSchedulingApp {
 //-------------------------------------------------------------------------------------------------------------------
 
     private void printGanttChart() {
-    int j = 1;
-    for (int i = 0; i < ((totalBurstTime + 1) * 4); i++) {
+    int j = 0;
+    for (int i = 0; i < ((totalBurstTime) * 4); i++) {
         System.out.print('-');
     }
     System.out.println();
 
-    for (int i = 0; i < (totalBurstTime * 4); i++) {
-        if (i == 0) {
-            System.out.print('|');
-        } 
-        else {
-            if (j <= ganttChartProcess.size()) {
-                    System.out.printf("%-" + (((ganttChartTime.get(j) - ganttChartTime.get(j - 1))) * 4) + "s", ganttChartProcess.get(j - 1));
-                    System.out.print('|');
-                }
-                j++;
-            }
-        }
-        
+    while (j < ganttChartProcess.size()) {
+        System.out.print('|');
+        System.out.printf("%-" + (((ganttChartTime.get(j + 1) - ganttChartTime.get(j))) * 4 - 1) + "s", ganttChartProcess.get(j));
+        j++;
+    }
+    System.out.print('|');
     System.out.println();
 
-    for (int i = 0; i < ((totalBurstTime + 1) * 4); i++) {
+    for (int i = 0; i < ((totalBurstTime) * 4); i++) {
         System.out.print('-');
     }
     System.out.println();
@@ -155,9 +148,8 @@ public class ProcessSchedulingApp {
     for (int k = 0; k < ganttChartTime.size(); k++) {
         if (k == ganttChartTime.size() - 1) {
             System.out.print(ganttChartTime.getLast());
-        }
-        else {
-            System.out.printf("%-" + (((ganttChartTime.get(k + 1) - ganttChartTime.get(k)) * 4) + 1) + "s", ganttChartTime.get(k));
+        } else {
+            System.out.printf("%-" + (((ganttChartTime.get(k + 1) - ganttChartTime.get(k)) * 4)) + "s", ganttChartTime.get(k));
         }
     }
     System.out.println();
