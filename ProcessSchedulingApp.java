@@ -34,6 +34,16 @@ public class ProcessSchedulingApp {
         burstTime = getValues("burst time");
         priority = getValues("priority");
 
+        // Make sure there exist at least one zero in the arrival time
+        do {
+            if (arrivalTimeConsistOfZero())
+                break;
+
+            for (int i = 0; i < numberOfProcess; i++)
+                arrivalTime.set(i, arrivalTime.get(i) - 1);
+
+        } while (true);
+
         totalBurstTime = 0;
         for (int x : burstTime)
             totalBurstTime += x;
@@ -111,6 +121,16 @@ public class ProcessSchedulingApp {
         int value = input.nextInt();
 
         return value;
+    }
+
+    private boolean arrivalTimeConsistOfZero() {
+        boolean arrivalTimeConsistOfZero = true;
+
+        for (int x : arrivalTime)
+            if (x == 0)
+                arrivalTimeConsistOfZero = false;
+
+        return arrivalTimeConsistOfZero;
     }
 
 //-------------------------------------------------------------------------------------------------------------------
