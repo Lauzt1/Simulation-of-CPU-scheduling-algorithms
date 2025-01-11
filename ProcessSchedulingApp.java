@@ -127,8 +127,10 @@ public class ProcessSchedulingApp {
         boolean arrivalTimeConsistOfZero = true;
 
         for (int x : arrivalTime)
-            if (x == 0)
+            if (x != 0)
                 arrivalTimeConsistOfZero = false;
+            else
+                arrivalTimeConsistOfZero = true;
 
         return arrivalTimeConsistOfZero;
     }
