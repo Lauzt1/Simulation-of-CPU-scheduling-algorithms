@@ -124,9 +124,10 @@ public class ProcessSchedulingApp {
     }
 
     private boolean arrivalTimeConsistOfZero() {
-        for (int x : arrivalTime)
+        for (int x : arrivalTime) {
             if (x == 0)
                 return true;
+        }
         return false;
     }
 
