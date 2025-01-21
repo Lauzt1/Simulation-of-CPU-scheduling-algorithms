@@ -144,35 +144,36 @@ public class ProcessSchedulingApp {
 //-------------------------------------------------------------------------------------------------------------------
 
     private void printGanttChart() {
-    int j = 0;
-    for (int i = 0; i < ((totalBurstTime) * 4); i++) {
-        System.out.print('-');
-    }
-    System.out.println();
+        System.out.println();
+        System.out.println();
 
-    while (j < ganttChartProcess.size()) {
-        System.out.print('|');
-        System.out.printf("%-" + (((ganttChartTime.get(j + 1) - ganttChartTime.get(j))) * 4 - 1) + "s", ganttChartProcess.get(j));
-        j++;
-    }
-    System.out.print('|');
-    System.out.println();
-
-    for (int i = 0; i < ((totalBurstTime) * 4); i++) {
-        System.out.print('-');
-    }
-    System.out.println();
-
-    for (int k = 0; k < ganttChartTime.size(); k++) {
-        if (k == ganttChartTime.size() - 1) {
-            System.out.print(ganttChartTime.getLast());
-        } else {
-            System.out.printf("%-" + (((ganttChartTime.get(k + 1) - ganttChartTime.get(k)) * 4)) + "s", ganttChartTime.get(k));
+        System.out.println("Gantt Chart:");
+        System.out.print("-");
+        for (int i = 0; i < ganttChartProcess.size(); i++) {
+            System.out.print("-------");
         }
+
+        System.out.print("\n|");
+        for (int i = 0; i < ganttChartProcess.size(); i++) {
+            System.out.print("  " + ganttChartProcess.get(i) + "  |");
+        }
+
+        System.out.print("\n|");
+        for (int i = 0; i < ganttChartProcess.size(); i++) {
+            System.out.print("------|");
+        }
+
+        System.out.println();
+        for (int i = 0; i < ganttChartTime.size(); i++) {
+            System.out.print(ganttChartTime.get(i));
+
+                for (int j = 0; j < 7 - String.valueOf(ganttChartTime.get(i)).length(); j++)
+                    System.out.print(" ");   
+        }
+
+        System.out.println();
+        System.out.println();
     }
-    System.out.println();
-    System.out.println();
-}
 
 //-------------------------------------------------------------------------------------------------------------------
 
@@ -277,7 +278,11 @@ public class ProcessSchedulingApp {
         }
         averageTurnaroundTime = (double)totalTurnaroundTime / numberOfProcess;
         averageWaitingTime = (double)totalWaitingTime / numberOfProcess;
-        System.out.println("\nAverage Turnaround Time: " + averageTurnaroundTime);
-        System.out.println("\nAverage Waiting Time: " + averageWaitingTime);
+
+        String formattedAverageTurnaroundTime = String.format("%.2f", averageTurnaroundTime);
+        String formattedAverageWaitingTime = String.format("%.2f", averageWaitingTime);
+
+        System.out.println("\nAverage Turnaround Time: " + formattedAverageTurnaroundTime);
+        System.out.println("\nAverage Waiting Time: " + formattedAverageWaitingTime);
     }
 }
