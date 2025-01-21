@@ -48,6 +48,7 @@ public class ProcessSchedulingApp {
         for (int x : burstTime)
             totalBurstTime += x;
 
+        System.out.println("\n-------------------------------------------------------------------------------------------------");
         do {
             typeOfAlgorithm = getTypeOfAlgorithm();
 
@@ -111,7 +112,6 @@ public class ProcessSchedulingApp {
     }
 
     private int getTypeOfAlgorithm() {
-        System.out.println("\n-----------------------------------------------");
         System.out.println("\nType of Algorithm: ");
         System.out.println("[1] Round Robin");
         System.out.println("[2] Shortest Job Next");
@@ -145,7 +145,6 @@ public class ProcessSchedulingApp {
 
     private void printGanttChart() {
         System.out.println();
-        System.out.println();
 
         System.out.println("Gantt Chart:");
         System.out.print("-");
@@ -170,90 +169,60 @@ public class ProcessSchedulingApp {
                 for (int j = 0; j < 7 - String.valueOf(ganttChartTime.get(i)).length(); j++)
                     System.out.print(" ");   
         }
-
-        System.out.println();
-        System.out.println();
     }
 
 //-------------------------------------------------------------------------------------------------------------------
 
     private void printTable() {
-        for (int i = 0; i < 71; i++) {
-            System.out.print('-');
-        }
+        System.out.println();
+        System.out.println();
 
-        System.out.println(' ');
-
-        for (int i = 0; i < 71; i++) {
-            if (i == 0 || i == 3 || i == 16 || i == 27 || i == 42 || i == 58 || i == 70) {
-                System.out.print('|');
-            }
-            else if (i == 2) {
-                System.out.print("  ");
-            }
-            else if (i == 3) {
-                System.out.print(' ');
-            }
-            else if (i == 4) {
-                System.out.print("ARRIVAL TIME");
-            }
-            else if (i == 17) {
-                System.out.print("BURST TIME");
-            }
-            else if (i == 28) {
-                System.out.print("FINISHING TIME");
-            }
-            else if (i == 43) {
-                System.out.print("TURNAROUND TIME");
-            }
-            else if (i == 59) {
-                System.out.print("WAITING TIME");
-            }
-        }
-        
-        System.out.println(' ');
-
-        for (int i = 0; i < 71; i++) {
-            System.out.print('-');
-        }
-        System.out.println(' ');
+        System.out.println("Table:");
+        System.out.println("-------------------------------------------------------------------------------------------------");
+        System.out.println("| Process | Arrival Time | Burst Time | Priority | Finish Time | Turnaround Time | Waiting Time |");
 
         for (int i = 0; i < numberOfProcess * 2; i++) {
-            if (i % 2 == 0)
-            {
-                for (int j = 0; j < 72; j++) {
-                    if (j == 0 || j == 3 || j == 16 || j == 27 || j == 42 || j == 58 || j == 71) {
-                        System.out.print('|');
-                    }
-                    else if (j == 1) {
-                        System.out.printf("%-2s", processName.get(i / 2));
-                    }
-                    else if (j == 4) {
-                        System.out.printf("%-12d", arrivalTime.get(i / 2));
-                    }
-                    else if (j == 17) {
-                        System.out.printf("%-10d", burstTime.get(i / 2));
-                    }
-                    else if (j == 28) {
-                        System.out.printf("%-14d", finishTime.get(i / 2));
-                    }
-                    else if (j == 43) {
-                        System.out.printf("%-15d", turnaroundTime.get(i / 2));
-                    }
-                    else if (j == 59) {
-                        System.out.printf("%-12d", waitingTime.get(i / 2));
-                    }
-                }
-                System.out.println(' ');
+            if (i % 2 == 0) {
+                System.out.println("|---------|--------------|------------|----------|-------------|-----------------|--------------|");
             }
             else {
-                for (int j = 0; j < 71; j++) {
-                    System.out.print('-');
+                System.out.print("| " + processName.get(i / 2) + "      ");
+
+                System.out.print("| " + arrivalTime.get(i / 2));
+                for (int j = 0; j < 13 - String.valueOf(arrivalTime.get(i / 2)).length(); j++) {
+                    System.out.print(" ");
                 }
-                System.out.println(' ');
+
+                System.out.print("| " + burstTime.get(i / 2));
+                for (int j = 0; j < 11 - String.valueOf(burstTime.get(i / 2)).length(); j++) {
+                    System.out.print(" ");
+                }
+
+                System.out.print("| " + priority.get(i / 2));
+                for (int j = 0; j < 9 - String.valueOf(priority.get(i / 2)).length(); j++) {
+                    System.out.print(" ");
+                }
+
+                System.out.print("| " + finishTime.get(i / 2));
+                for (int j = 0; j < 12 - String.valueOf(finishTime.get(i / 2)).length(); j++) {
+                    System.out.print(" ");
+                }
+
+                System.out.print("| " + turnaroundTime.get(i / 2));
+                for (int j = 0; j < 16 - String.valueOf(turnaroundTime.get(i / 2)).length(); j++) {
+                    System.out.print(" ");
+                }
+
+                System.out.print("| " + waitingTime.get(i / 2));
+                for (int j = 0; j < 13 - String.valueOf(waitingTime.get(i / 2)).length(); j++) {
+                    System.out.print(" ");
+                }
+
+                System.out.println("|");
             }
-            
         }
+
+        System.out.println("-------------------------------------------------------------------------------------------------");
     }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -284,5 +253,6 @@ public class ProcessSchedulingApp {
 
         System.out.println("\nAverage Turnaround Time: " + formattedAverageTurnaroundTime);
         System.out.println("\nAverage Waiting Time: " + formattedAverageWaitingTime);
+        System.out.println("\n-------------------------------------------------------------------------------------------------");
     }
 }
