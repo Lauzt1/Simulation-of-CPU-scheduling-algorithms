@@ -31,7 +31,6 @@ public class SJN {
     }
 
     public void startProcess() {
-        // algorithm that will update the LinkedList of ganttChartTime, ganttChartProcess, and finishTime
         LinkedList<String> tempProcessName = new LinkedList<>(processName);
         LinkedList<Integer> tempArrivalTime = new LinkedList<>(arrivalTime);
         LinkedList<Integer> tempBurstTime = new LinkedList<>(burstTime);
@@ -41,13 +40,17 @@ public class SJN {
         ganttChartTime.add(0);
         String firstProcess = null;
 
-        // adding first element into Gantt chart
+        for (int i = 0; i < numberOfProcess; i++) {
+            finishTime.add(0);
+        }
+
+        // Adding the first element into Gantt chart
         for (int i = 0; i < numberOfProcess; i++) {
             if (tempArrivalTime.get(i) == 0) {
                 firstProcess = tempProcessName.get(i);
                 ganttChartTime.add(tempBurstTime.get(i));
                 ganttChartProcess.add(firstProcess);
-                finishTime.add(tempBurstTime.get(i));
+                finishTime.set(i, tempBurstTime.get(i));
                 tempProcessName.remove(i);
                 tempBurstTime.remove(i);
                 tempArrivalTime.remove(i);
@@ -55,7 +58,7 @@ public class SJN {
             }
         }
 
-        // adding the remaining elements into Gantt chart
+        // Adding the remaining elements into Gantt chart
         while (tempProcessName.size() > 0) {
             for (int i = 0; i < tempProcessName.size(); i++) {
                 if (tempArrivalTime.get(i) <= ganttChartTime.getLast()) {
@@ -65,24 +68,34 @@ public class SJN {
                 }
             }
 
-            int shortestBurstTime = waitingQueueBurstTime.get(0);
             int shortestBurstTimeIndex = 0;
+            int shortestBurstTime = waitingQueueBurstTime.get(shortestBurstTimeIndex);
             for (int i = 1; i < waitingQueueProcess.size(); i++) {
                 if (waitingQueueBurstTime.get(i) < shortestBurstTime) {
+                    shortestBurstTime = waitingQueueBurstTime.get(i);
                     shortestBurstTimeIndex = i;
                 }
             }
 
+            String finishedProcess = waitingQueueProcess.get(shortestBurstTimeIndex);
+            Integer finishedProcessIndex = processName.indexOf(finishedProcess);
+
             for (int i = 0; i < tempProcessName.size(); i++) {
-                if (tempProcessName.get(i) == waitingQueueProcess.get(shortestBurstTimeIndex)) {
+                if (tempProcessName.get(i).equals(finishedProcess)) {
                     tempProcessName.remove(i);
                     tempBurstTime.remove(i);
                     tempArrivalTime.remove(i);
+                    break;
                 }
             }
-            ganttChartTime.add(ganttChartTime.getLast() + waitingQueueBurstTime.get(shortestBurstTimeIndex));
-            ganttChartProcess.add(waitingQueueProcess.get(shortestBurstTimeIndex));
-            finishTime.add(finishTime.getLast() + waitingQueueBurstTime.get(shortestBurstTimeIndex));
+
+            ganttChartTime.add(ganttChartTime.getLast() + shortestBurstTime);
+            ganttChartProcess.add(finishedProcess);
+
+            if (finishedProcessIndex != -1) {
+                finishTime.set(finishedProcessIndex, ganttChartTime.getLast());
+            }
+
             waitingQueueProcess.clear();
             waitingQueueArrivalTime.clear();
             waitingQueueBurstTime.clear();
