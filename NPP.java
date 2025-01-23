@@ -28,6 +28,11 @@ public class NPP {
         this.ganttChartTime = temp.ganttChartTime;
         this.ganttChartProcess = temp.ganttChartProcess;
         this.finishTime = temp.finishTime;
+
+        // initialize finishTime with placeholder values for correct indexing
+        for (int i = 0; i < numberOfProcess; i++) {
+            finishTime.add(0); // ensure each process has a placeholder finish time
+        }
     }
 
     public void startProcess() {
@@ -46,12 +51,14 @@ public class NPP {
         // gantt chart time at 0
         ganttChartTime.add(0);
 
-        
         for (int i = 0; i < tempProcessName.size(); i++) {  // find a process that arrives at time 0 (if any) and schedule it first
             if (tempArrivalTime.get(i) == 0) {
                 ganttChartTime.add(tempBurstTime.get(i));  // ending time for this process
                 ganttChartProcess.add(tempProcessName.get(i));
-                finishTime.add(tempBurstTime.get(i));      // finishing time of the first process
+
+                // Store the correct finish time at the process's original index
+                int originalIndex = Integer.parseInt(tempProcessName.get(i).substring(1));
+                finishTime.set(originalIndex, tempBurstTime.get(i));
 
                 // remove the process from the temporary lists after finishing
                 tempProcessName.remove(i);
@@ -62,7 +69,6 @@ public class NPP {
             }
         }
 
-        
         while (!tempProcessName.isEmpty()) {    // continue until we schedule all processes
 
             // collect all processes that have arrived by the current Gantt time
@@ -88,7 +94,10 @@ public class NPP {
                 // move Gantt time to that arrival, schedule it
                 ganttChartTime.add(earliestTime);
                 ganttChartProcess.add(tempProcessName.get(earliestIndex));
-                finishTime.add(earliestTime);
+
+                // store the finish time at the process's original index
+                int originalIndex = Integer.parseInt(tempProcessName.get(earliestIndex).substring(1));
+                finishTime.set(originalIndex, ganttChartTime.getLast());
 
                 // remove it from the temporary lists
                 tempProcessName.remove(earliestIndex);
@@ -96,7 +105,7 @@ public class NPP {
                 tempBurstTime.remove(earliestIndex);
                 tempPriority.remove(earliestIndex);
 
-                continue; 
+                continue;
             }
 
             // choose the one waiting process with HIGHEST priority (lower number means higher priority)
@@ -112,12 +121,16 @@ public class NPP {
 
             // schedule the highest-priority process
             String chosenProcess = waitingQueueProcess.get(highestPriorityIndex);
-            int chosenBurst    = waitingQueueBurst.get(highestPriorityIndex);
+            int chosenBurst = waitingQueueBurst.get(highestPriorityIndex);
 
             // update Gantt Chart
-            ganttChartTime.add(ganttChartTime.getLast() + chosenBurst);
+            int newFinishTime = ganttChartTime.getLast() + chosenBurst;
+            ganttChartTime.add(newFinishTime);
             ganttChartProcess.add(chosenProcess);
-            finishTime.add(finishTime.getLast() + chosenBurst);
+
+            // Store the finish time at the process's original index
+            int originalIndex = Integer.parseInt(chosenProcess.substring(1));
+            finishTime.set(originalIndex, newFinishTime);
 
             // remove it from temp lists
             for (int i = 0; i < tempProcessName.size(); i++) {
