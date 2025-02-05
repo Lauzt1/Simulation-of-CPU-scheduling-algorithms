@@ -4,20 +4,22 @@ public class NPP {
 
     int numberOfProcess;
 
-    LinkedList<String> processName = new LinkedList<>();
-    LinkedList<Integer> arrivalTime = new LinkedList<>();
-    LinkedList<Integer> burstTime = new LinkedList<>();
-    LinkedList<Integer> priority = new LinkedList<>();
+    // process information
+    LinkedList<String> processName;
+    LinkedList<Integer> arrivalTime;
+    LinkedList<Integer> burstTime;
+    LinkedList<Integer> priority;
 
     int totalBurstTime;
-
     int typeOfAlgorithm;
 
-    LinkedList<Integer> ganttChartTime = new LinkedList<>();
-    LinkedList<String> ganttChartProcess = new LinkedList<>();
-    LinkedList<Integer> finishTime = new LinkedList<>();
+    // for the Gantt chart and finish times
+    LinkedList<Integer> ganttChartTime;
+    LinkedList<String> ganttChartProcess;
+    LinkedList<Integer> finishTime;
 
     public NPP(ProcessSchedulingApp temp) {
+        // copy data from ProcessSchedulingApp
         this.numberOfProcess = temp.numberOfProcess;
         this.processName = temp.processName;
         this.arrivalTime = temp.arrivalTime;
@@ -29,125 +31,72 @@ public class NPP {
         this.ganttChartProcess = temp.ganttChartProcess;
         this.finishTime = temp.finishTime;
 
-        // initialize finishTime with placeholder values for correct indexing
+        // initialize finishTime with placeholder values (one for each process)
         for (int i = 0; i < numberOfProcess; i++) {
-            finishTime.add(0); // ensure each process has a placeholder finish time
+            finishTime.add(0);
         }
     }
 
     public void startProcess() {
-        // create temporary lists so we can remove processes as we schedule them
-        LinkedList<String> tempProcessName = new LinkedList<>(processName);
-        LinkedList<Integer> tempArrivalTime = new LinkedList<>(arrivalTime);
-        LinkedList<Integer> tempBurstTime = new LinkedList<>(burstTime);
-        LinkedList<Integer> tempPriority = new LinkedList<>(priority);
-
-        // queues to hold waiting processes that arrived but not yet executed
-        LinkedList<String> waitingQueueProcess = new LinkedList<>();
-        LinkedList<Integer> waitingQueueArrival = new LinkedList<>();
-        LinkedList<Integer> waitingQueueBurst = new LinkedList<>();
-        LinkedList<Integer> waitingQueuePriority = new LinkedList<>();
-
-        // gantt chart time at 0
+        int currentTime = 0;    // simulation clock
+        int completed = 0;      // count of processes that have finished
+        
+        // start the Gantt chart at time 0.
+        ganttChartTime.clear();
+        ganttChartProcess.clear();
         ganttChartTime.add(0);
 
-        for (int i = 0; i < tempProcessName.size(); i++) {  // find a process that arrives at time 0 (if any) and schedule it first
-            if (tempArrivalTime.get(i) == 0) {
-                ganttChartTime.add(tempBurstTime.get(i));  // ending time for this process
-                ganttChartProcess.add(tempProcessName.get(i));
+        // boolean array to mark if a process is finished.
+        boolean[] isCompleted = new boolean[numberOfProcess];
 
-                // Store the correct finish time at the process's original index
-                int originalIndex = Integer.parseInt(tempProcessName.get(i).substring(1));
-                finishTime.set(originalIndex, tempBurstTime.get(i));
-
-                // remove the process from the temporary lists after finishing
-                tempProcessName.remove(i);
-                tempArrivalTime.remove(i);
-                tempBurstTime.remove(i);
-                tempPriority.remove(i);
-                break;
-            }
-        }
-
-        while (!tempProcessName.isEmpty()) {    // continue until we schedule all processes
-
-            // collect all processes that have arrived by the current Gantt time
-            for (int i = 0; i < tempProcessName.size(); i++) {
-                if (tempArrivalTime.get(i) <= ganttChartTime.getLast()) {
-                    waitingQueueProcess.add(tempProcessName.get(i));
-                    waitingQueueArrival.add(tempArrivalTime.get(i));
-                    waitingQueueBurst.add(tempBurstTime.get(i));
-                    waitingQueuePriority.add(tempPriority.get(i));
+        // continue until all processes have been scheduled.
+        while (completed < numberOfProcess) {
+            // collect the indices of all processes that have arrived and are not yet completed.
+            ArrayList<Integer> available = new ArrayList<>();
+            for (int i = 0; i < numberOfProcess; i++) {
+                if (!isCompleted[i] && arrivalTime.get(i) <= currentTime) {
+                    available.add(i);
                 }
             }
 
-            // pick next earliest arrival
-            if (waitingQueueProcess.isEmpty()) {
-                int earliestIndex = 0;
-                int earliestTime = tempArrivalTime.get(0);
-                for (int i = 1; i < tempArrivalTime.size(); i++) {
-                    if (tempArrivalTime.get(i) < earliestTime) {
-                        earliestTime = tempArrivalTime.get(i);
-                        earliestIndex = i;
+            if (available.isEmpty()) {
+                // no process has arrived yet. Advance currentTime to the next arrival.
+                int nextArrival = Integer.MAX_VALUE;
+                for (int i = 0; i < numberOfProcess; i++) {
+                    if (!isCompleted[i] && arrivalTime.get(i) < nextArrival) {
+                        nextArrival = arrivalTime.get(i);
                     }
                 }
-                // move Gantt time to that arrival, schedule it
-                ganttChartTime.add(earliestTime);
-                ganttChartProcess.add(tempProcessName.get(earliestIndex));
-
-                // store the finish time at the process's original index
-                int originalIndex = Integer.parseInt(tempProcessName.get(earliestIndex).substring(1));
-                finishTime.set(originalIndex, ganttChartTime.getLast());
-
-                // remove it from the temporary lists
-                tempProcessName.remove(earliestIndex);
-                tempArrivalTime.remove(earliestIndex);
-                tempBurstTime.remove(earliestIndex);
-                tempPriority.remove(earliestIndex);
-
-                continue;
+                currentTime = nextArrival;
+                continue;  // check again for available processes.
             }
 
-            // choose the one waiting process with HIGHEST priority (lower number means higher priority)
-            int highestPriorityIndex = 0;
-            int minPriorityValue = waitingQueuePriority.get(0);
-
-            for (int i = 1; i < waitingQueuePriority.size(); i++) {
-                if (waitingQueuePriority.get(i) < minPriorityValue) {
-                    minPriorityValue = waitingQueuePriority.get(i);
-                    highestPriorityIndex = i;
+            // select the process with the highest priority (lowest priority value).
+            int chosenIndex = available.get(0);
+            for (int idx : available) {
+                // if the process has a lower priority value, choose it.
+                if (priority.get(idx) < priority.get(chosenIndex)) {
+                    chosenIndex = idx;
+                }
+                // if both have the same priority, choose the one with the earlier arrival time.
+                else if (priority.get(idx).equals(priority.get(chosenIndex))) {
+                    if (arrivalTime.get(idx) < arrivalTime.get(chosenIndex)) {
+                        chosenIndex = idx;
+                    }
                 }
             }
 
-            // schedule the highest-priority process
-            String chosenProcess = waitingQueueProcess.get(highestPriorityIndex);
-            int chosenBurst = waitingQueueBurst.get(highestPriorityIndex);
+            // schedule the chosen process (run it to completion).
+            currentTime += burstTime.get(chosenIndex);
+            finishTime.set(chosenIndex, currentTime);
 
-            // update Gantt Chart
-            int newFinishTime = ganttChartTime.getLast() + chosenBurst;
-            ganttChartTime.add(newFinishTime);
-            ganttChartProcess.add(chosenProcess);
+            // add the process to the Gantt chart.
+            ganttChartProcess.add(processName.get(chosenIndex));
+            ganttChartTime.add(currentTime);
 
-            // Store the finish time at the process's original index
-            int originalIndex = Integer.parseInt(chosenProcess.substring(1));
-            finishTime.set(originalIndex, newFinishTime);
-
-            // remove it from temp lists
-            for (int i = 0; i < tempProcessName.size(); i++) {
-                if (tempProcessName.get(i).equals(chosenProcess)) {
-                    tempProcessName.remove(i);
-                    tempArrivalTime.remove(i);
-                    tempBurstTime.remove(i);
-                    tempPriority.remove(i);
-                    break;
-                }
-            }
-
-            // clear the waiting queue for the next iteration
-            waitingQueueProcess.clear();
-            waitingQueueArrival.clear();
-            waitingQueueBurst.clear();
-            waitingQueuePriority.clear();
+            // mark the process as completed.
+            isCompleted[chosenIndex] = true;
+            completed++;
         }
     }
 }

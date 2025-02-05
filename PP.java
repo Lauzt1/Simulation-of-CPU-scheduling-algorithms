@@ -1,119 +1,121 @@
 import java.util.*;
 
 public class PP {
-    private ProcessSchedulingApp app;
-    private PriorityQueue<Process> queue;
-    private List<Process> processList;
 
-    public PP(ProcessSchedulingApp app) {
-        this.app = app;
-        this.queue = new PriorityQueue<>((a, b) -> a.priority == b.priority ? a.arrivalTime - b.arrivalTime : a.priority - b.priority);
-        this.processList = new ArrayList<>();
-        for (int i = 0; i < app.numberOfProcess; i++) {
-            processList.add(new Process(
-                app.processName.get(i),
-                app.arrivalTime.get(i),
-                app.burstTime.get(i),
-                app.priority.get(i)
-            ));
+    int numberOfProcess;
+
+    LinkedList<String> processName;
+    LinkedList<Integer> arrivalTime;
+    LinkedList<Integer> burstTime;
+    LinkedList<Integer> priority;
+
+    int totalBurstTime;
+    int typeOfAlgorithm;
+
+    LinkedList<Integer> ganttChartTime;
+    LinkedList<String> ganttChartProcess;
+    LinkedList<Integer> finishTime;
+
+    public PP(ProcessSchedulingApp temp) {
+        // Copy values from ProcessSchedulingApp so that PP works with the same data
+        this.numberOfProcess = temp.numberOfProcess;
+        this.processName = temp.processName;
+        this.arrivalTime = temp.arrivalTime;
+        this.burstTime = temp.burstTime;
+        this.priority = temp.priority;
+        this.totalBurstTime = temp.totalBurstTime;
+        this.typeOfAlgorithm = temp.typeOfAlgorithm;
+        this.ganttChartTime = temp.ganttChartTime;
+        this.ganttChartProcess = temp.ganttChartProcess;
+        this.finishTime = temp.finishTime;
+        
+        // Initialize finishTime with placeholder values for proper indexing
+        for (int i = 0; i < numberOfProcess; i++) {
+            finishTime.add(0);
         }
     }
 
     public void startProcess() {
-        int currentTime = 0;
-        int completed = 0;
-        Process currentProcess = null;
-        int processStartTime = 0;
-    
-        List<Process> processCopy = new ArrayList<>();
-        for (Process p : processList) {
-            p.priority = 1 / p.burstTime; // Initial priority (inverse of burst time)
-            processCopy.add(new Process(p));
+        // This implementation of Preemptive Priority scheduling simulates the CPU cycle one time unit at a time.
+        // At each time unit, it selects from the processes that have already arrived (arrivalTime <= currentTime)
+        // the one with the highest priority (lowest priority number). If no process is available, the CPU remains idle.
+
+        int n = numberOfProcess;
+        int[] remainingBurst = new int[n];  // remaining burst times for each process
+
+        // Initialize the remaining burst times from the burstTime list
+        for (int i = 0; i < n; i++) {
+            remainingBurst[i] = burstTime.get(i);
         }
-    
-        // Add 0 to the Gantt chart at the start
-        app.ganttChartTime.add(0);
-    
-        while (completed < processList.size()) {
-            for (Process p : processCopy) {
-                if (p.arrivalTime == currentTime && !p.completed) {
-                    queue.add(p);
+
+        // We will record which process (or idle) is executed at each time unit.
+        // Later, we will “compress” these time units into segments for the Gantt chart.
+        ArrayList<String> executionSequence = new ArrayList<>();
+
+        int completedProcesses = 0; // count of processes that have finished
+        int currentTime = 0;        // simulation clock
+
+        // Run the simulation until all processes are completed
+        while (completedProcesses < n) {
+            int selectedProcess = -1; 
+            int minPriority = Integer.MAX_VALUE;
+            
+            // Look for processes that have arrived and are not finished
+            for (int i = 0; i < n; i++) {
+                if (arrivalTime.get(i) <= currentTime && remainingBurst[i] > 0) {
+                    int procPriority = priority.get(i);
+                    // Select process with a lower (i.e. higher) priority value.
+                    if (procPriority < minPriority) {
+                        minPriority = procPriority;
+                        selectedProcess = i;
+                    } else if (procPriority == minPriority) {
+                        // Tie-breaker: if two processes have the same priority, choose the one with the earlier arrival time.
+                        if (arrivalTime.get(i) < arrivalTime.get(selectedProcess)) {
+                            selectedProcess = i;
+                        }
+                    }
                 }
             }
-    
-            if (queue.isEmpty()) {
+
+            if (selectedProcess == -1) {
+                // No process is available at this time (all have not arrived yet); CPU is idle.
+                executionSequence.add("idle");
                 currentTime++;
-                continue;
-            }
-    
-            // Update priority dynamically: waitingTime / remainingBurstTime
-            for (Process p : queue) {
-                p.priority = (currentTime - p.arrivalTime) / (p.remainingBurst == 0 ? 1 : p.remainingBurst);
-            }
-    
-            // Sort queue based on updated priority
-            List<Process> tempQueue = new ArrayList<>(queue);
-            tempQueue.sort((a, b) -> a.priority == b.priority ? a.arrivalTime - b.arrivalTime : a.priority - b.priority);
-            queue.clear();
-            queue.addAll(tempQueue);
-    
-            Process highestPriorityProcess = queue.poll();
-    
-            // If a new process takes over, log previous process in Gantt Chart
-            if (currentProcess != highestPriorityProcess) {
-                if (currentProcess != null) {
-                    app.ganttChartProcess.add(currentProcess.name);
-                    app.ganttChartTime.add(currentTime); // Log the finish time of the previous process
-                }
-                currentProcess = highestPriorityProcess;
-                processStartTime = currentTime;
-            }
-    
-            currentProcess.remainingBurst--;
-            currentTime++;
-    
-            if (currentProcess.remainingBurst == 0) {
-                currentProcess.completed = true;
-                currentProcess.finishTime = currentTime;
-                currentProcess.turnaroundTime = currentProcess.finishTime - currentProcess.arrivalTime;
-                currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
-    
-                app.finishTime.add(currentProcess.finishTime);
-                app.turnaroundTime.add(currentProcess.turnaroundTime);
-                app.waitingTime.add(currentProcess.waitingTime);
-    
-                completed++;
             } else {
-                queue.add(currentProcess); // Put back if not completed
+                // Run the selected process for one time unit.
+                executionSequence.add("P" + selectedProcess);
+                remainingBurst[selectedProcess]--;
+                currentTime++;
+
+                // If the process has finished executing, record its finish time.
+                if (remainingBurst[selectedProcess] == 0) {
+                    finishTime.set(selectedProcess, currentTime);
+                    completedProcesses++;
+                }
             }
         }
-    
-        // Add the final time to the Gantt chart
-        app.ganttChartProcess.add(currentProcess.name);
-        app.ganttChartTime.add(currentTime);
-    }
-}
 
-class Process {
-    String name;
-    int arrivalTime, burstTime, priority, finishTime, turnaroundTime, waitingTime, remainingBurst;
-    boolean completed;
+        // Build the Gantt chart from the executionSequence.
+        // The idea is to compress consecutive identical entries (e.g., several "P0" in a row) into one segment.
+        ganttChartTime.clear();
+        ganttChartProcess.clear();
+        ganttChartTime.add(0);  // the chart starts at time 0
 
-    public Process(String name, int arrivalTime, int burstTime, int priority) {
-        this.name = name;
-        this.arrivalTime = arrivalTime;
-        this.burstTime = burstTime;
-        this.priority = priority;
-        this.remainingBurst = burstTime;
-        this.completed = false;
-    }
+        // Start with the first executed process (or idle)
+        String currentSegment = executionSequence.get(0);
+        ganttChartProcess.add(currentSegment);
 
-    public Process(Process p) {
-        this.name = p.name;
-        this.arrivalTime = p.arrivalTime;
-        this.burstTime = p.burstTime;
-        this.priority = p.priority;
-        this.remainingBurst = p.remainingBurst;
-        this.completed = p.completed;
+        // Loop through the execution sequence and note the time when the process changes.
+        for (int i = 1; i < executionSequence.size(); i++) {
+            String proc = executionSequence.get(i);
+            if (!proc.equals(currentSegment)) {
+                // Process change detected; record the finishing time of the previous segment.
+                ganttChartTime.add(i);
+                ganttChartProcess.add(proc);
+                currentSegment = proc;
+            }
+        }
+        // Record the final finish time (which is the length of the execution sequence).
+        ganttChartTime.add(executionSequence.size());
     }
 }
