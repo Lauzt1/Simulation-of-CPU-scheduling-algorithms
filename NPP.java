@@ -4,7 +4,7 @@ public class NPP {
 
     int numberOfProcess;
 
-    // process information
+    // Process information lists (from ProcessSchedulingApp)
     LinkedList<String> processName;
     LinkedList<Integer> arrivalTime;
     LinkedList<Integer> burstTime;
@@ -13,13 +13,13 @@ public class NPP {
     int totalBurstTime;
     int typeOfAlgorithm;
 
-    // for the Gantt chart and finish times
+    // Gantt chart and finish time lists (shared with ProcessSchedulingApp)
     LinkedList<Integer> ganttChartTime;
     LinkedList<String> ganttChartProcess;
     LinkedList<Integer> finishTime;
 
     public NPP(ProcessSchedulingApp temp) {
-        // copy data from ProcessSchedulingApp
+        // Copy values from ProcessSchedulingApp so that NPP works with the same data
         this.numberOfProcess = temp.numberOfProcess;
         this.processName = temp.processName;
         this.arrivalTime = temp.arrivalTime;
@@ -31,7 +31,7 @@ public class NPP {
         this.ganttChartProcess = temp.ganttChartProcess;
         this.finishTime = temp.finishTime;
 
-        // initialize finishTime with placeholder values (one for each process)
+        // Initialize finishTime with placeholder values for proper indexing
         for (int i = 0; i < numberOfProcess; i++) {
             finishTime.add(0);
         }
@@ -39,19 +39,19 @@ public class NPP {
 
     public void startProcess() {
         int currentTime = 0;    // simulation clock
-        int completed = 0;      // count of processes that have finished
-        
-        // start the Gantt chart at time 0.
+        int completed = 0;      // number of processes finished
+
+        // Clear and initialize the Gantt chart lists
         ganttChartTime.clear();
         ganttChartProcess.clear();
         ganttChartTime.add(0);
 
-        // boolean array to mark if a process is finished.
+        // Array to mark if a process has been completed
         boolean[] isCompleted = new boolean[numberOfProcess];
 
-        // continue until all processes have been scheduled.
+        // Run the simulation until all processes are scheduled
         while (completed < numberOfProcess) {
-            // collect the indices of all processes that have arrived and are not yet completed.
+            // Build a list of process indices that have arrived and are not yet completed
             ArrayList<Integer> available = new ArrayList<>();
             for (int i = 0; i < numberOfProcess; i++) {
                 if (!isCompleted[i] && arrivalTime.get(i) <= currentTime) {
@@ -59,42 +59,44 @@ public class NPP {
                 }
             }
 
+            // If no process is available, add an idle period.
             if (available.isEmpty()) {
-                // no process has arrived yet. Advance currentTime to the next arrival.
                 int nextArrival = Integer.MAX_VALUE;
                 for (int i = 0; i < numberOfProcess; i++) {
                     if (!isCompleted[i] && arrivalTime.get(i) < nextArrival) {
                         nextArrival = arrivalTime.get(i);
                     }
                 }
+                if (currentTime < nextArrival) {
+                    // Record the idle period in the Gantt chart (using "i " for idle)
+                    ganttChartProcess.add("i ");
+                    ganttChartTime.add(nextArrival);
+                }
                 currentTime = nextArrival;
-                continue;  // check again for available processes.
+                continue;  // re-check available processes at the new current time
             }
 
-            // select the process with the highest priority (lowest priority value).
+            // Select the process with the highest priority (lowest numerical value).
+            // In case of a tie, choose the process with the earlier arrival time.
             int chosenIndex = available.get(0);
             for (int idx : available) {
-                // if the process has a lower priority value, choose it.
                 if (priority.get(idx) < priority.get(chosenIndex)) {
                     chosenIndex = idx;
-                }
-                // if both have the same priority, choose the one with the earlier arrival time.
-                else if (priority.get(idx).equals(priority.get(chosenIndex))) {
+                } else if (priority.get(idx).equals(priority.get(chosenIndex))) {
                     if (arrivalTime.get(idx) < arrivalTime.get(chosenIndex)) {
                         chosenIndex = idx;
                     }
                 }
             }
 
-            // schedule the chosen process (run it to completion).
+            // "Run" the chosen process to completion (non-preemptive)
             currentTime += burstTime.get(chosenIndex);
             finishTime.set(chosenIndex, currentTime);
 
-            // add the process to the Gantt chart.
+            // Record this process execution in the Gantt chart
             ganttChartProcess.add(processName.get(chosenIndex));
             ganttChartTime.add(currentTime);
 
-            // mark the process as completed.
             isCompleted[chosenIndex] = true;
             completed++;
         }

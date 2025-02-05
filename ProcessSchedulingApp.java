@@ -34,16 +34,6 @@ public class ProcessSchedulingApp {
         burstTime = getValues("burst time");
         priority = getValues("priority");
 
-        // Make sure there exist at least one zero in the arrival time
-        do {
-            if (arrivalTimeConsistOfZero())
-                break;
-
-            for (int i = 0; i < numberOfProcess; i++)
-                arrivalTime.set(i, arrivalTime.get(i) - 1);
-
-        } while (true);
-
         totalBurstTime = 0;
         for (int x : burstTime)
             totalBurstTime += x;
@@ -251,8 +241,8 @@ public class ProcessSchedulingApp {
         String formattedAverageTurnaroundTime = String.format("%.2f", averageTurnaroundTime);
         String formattedAverageWaitingTime = String.format("%.2f", averageWaitingTime);
 
-        System.out.println("\nAverage Turnaround Time: " + formattedAverageTurnaroundTime);
-        System.out.println("\nAverage Waiting Time: " + formattedAverageWaitingTime);
+        System.out.println("\nAverage Turnaround Time: " + formattedAverageTurnaroundTime + " ms");
+        System.out.println("\nAverage Waiting Time: " + formattedAverageWaitingTime + " ms");
         System.out.println("\n-------------------------------------------------------------------------------------------------");
     }
 }

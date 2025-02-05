@@ -36,10 +36,6 @@ public class PP {
     }
 
     public void startProcess() {
-        // This implementation of Preemptive Priority scheduling simulates the CPU cycle one time unit at a time.
-        // At each time unit, it selects from the processes that have already arrived (arrivalTime <= currentTime)
-        // the one with the highest priority (lowest priority number). If no process is available, the CPU remains idle.
-
         int n = numberOfProcess;
         int[] remainingBurst = new int[n];  // remaining burst times for each process
 
@@ -48,28 +44,26 @@ public class PP {
             remainingBurst[i] = burstTime.get(i);
         }
 
-        // We will record which process (or idle) is executed at each time unit.
-        // Later, we will “compress” these time units into segments for the Gantt chart.
+        // This list records the execution at each time unit.
         ArrayList<String> executionSequence = new ArrayList<>();
 
-        int completedProcesses = 0; // count of processes that have finished
-        int currentTime = 0;        // simulation clock
+        int completedProcesses = 0;
+        int currentTime = 0;
 
         // Run the simulation until all processes are completed
         while (completedProcesses < n) {
-            int selectedProcess = -1; 
+            int selectedProcess = -1;
             int minPriority = Integer.MAX_VALUE;
             
-            // Look for processes that have arrived and are not finished
+            // Check for processes that have arrived and are not finished
             for (int i = 0; i < n; i++) {
                 if (arrivalTime.get(i) <= currentTime && remainingBurst[i] > 0) {
                     int procPriority = priority.get(i);
-                    // Select process with a lower (i.e. higher) priority value.
                     if (procPriority < minPriority) {
                         minPriority = procPriority;
                         selectedProcess = i;
                     } else if (procPriority == minPriority) {
-                        // Tie-breaker: if two processes have the same priority, choose the one with the earlier arrival time.
+                        // Tie-breaker: choose the process with the earlier arrival time.
                         if (arrivalTime.get(i) < arrivalTime.get(selectedProcess)) {
                             selectedProcess = i;
                         }
@@ -78,8 +72,8 @@ public class PP {
             }
 
             if (selectedProcess == -1) {
-                // No process is available at this time (all have not arrived yet); CPU is idle.
-                executionSequence.add("idle");
+                // No process is available at this time; record an idle time unit.
+                executionSequence.add("i ");
                 currentTime++;
             } else {
                 // Run the selected process for one time unit.
@@ -95,27 +89,22 @@ public class PP {
             }
         }
 
-        // Build the Gantt chart from the executionSequence.
-        // The idea is to compress consecutive identical entries (e.g., several "P0" in a row) into one segment.
+        // Build the Gantt chart by compressing consecutive identical entries.
         ganttChartTime.clear();
         ganttChartProcess.clear();
-        ganttChartTime.add(0);  // the chart starts at time 0
+        ganttChartTime.add(0);
 
-        // Start with the first executed process (or idle)
         String currentSegment = executionSequence.get(0);
         ganttChartProcess.add(currentSegment);
 
-        // Loop through the execution sequence and note the time when the process changes.
         for (int i = 1; i < executionSequence.size(); i++) {
             String proc = executionSequence.get(i);
             if (!proc.equals(currentSegment)) {
-                // Process change detected; record the finishing time of the previous segment.
                 ganttChartTime.add(i);
                 ganttChartProcess.add(proc);
                 currentSegment = proc;
             }
         }
-        // Record the final finish time (which is the length of the execution sequence).
         ganttChartTime.add(executionSequence.size());
     }
 }
